@@ -4,7 +4,7 @@ import { deleteProducts, getProducts } from "../../repo/productsRepo";
 import { useHistory } from "react-router-dom";
 
 import CircularProgres from "@material-ui/core/CircularProgress"
-
+import Pagination from '@material-ui/lab/Pagination'
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
@@ -12,20 +12,33 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 
-
 const ProductData = () => {
     const history = useHistory()
     const [ productsData, setProductsData ] = useState([])
     const [loading, setLoading] = useState(false);
     const [deletedId, setDeletedId] = useState('');
+    const [page, setPage] = useState(0);
+    const [count, setCount] = useState(0);
 
+    const handlePaginationChange = (event, value) => {
+        console.log(value)
+        setPage(value);
+        getProductsRecords()
+    };
+
+    const getProductsRecords = () => {
+        console.log('getProductsRecords')
+       getProducts(page,2,"")
+        .then(res=> {
+            console.log(res)
+            setProductsData(res.data)
+            setCount(res.totalRecords)
+            
+        });
+    }
     useEffect(() => {
      // here please call api method here actually your method is different so i guiding you do that i wan
-    const data = getProducts(0,6,"")
-    .then(res=> {
-        console.log(res.data)
-        setProductsData(res.data)
-    });
+        getProductsRecords()
     }, [])
 
     const handleRowDelete = (oldData) => {
@@ -97,6 +110,10 @@ const ProductData = () => {
             </CardActions>
         </Card>
         })}
+
+        <Pagination count={count} page={page} onChange={handlePaginationChange} />
+
+
         </div>
     );
 };
